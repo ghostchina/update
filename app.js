@@ -4,6 +4,8 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var multer           = require('multer');
+var env              = process.env.NODE_ENV || 'development';
 
 var routes = require('./routes/index');
 var bookshelf = require('./db').bookshelf;
@@ -14,10 +16,43 @@ app.set('bookshelf',bookshelf);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.enable('trust proxy');
+
+app.disable('x-powered-by');
+
+
 app.use(favicon());
-app.use(logger('dev'));
+
+if (env === 'development') {
+app.use(logger('dev'))
+} else {
+app.use(logger())
+};
+
+app.use(function(req, res, next) {
+  var contentType = req.headers['content-type'] || ''
+    , mime = contentType.split(';')[0];
+
+  if (mime != '') {
+    return next();
+  }
+
+  var data = '';
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    data += chunk;
+  });
+  req.on('end', function() {
+    req.rawBody = data;
+    next();
+  });
+});
+
+app.use(multer());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
