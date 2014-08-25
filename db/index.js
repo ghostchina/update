@@ -1,7 +1,7 @@
 /**
  * Created by liuxing on 14-8-24.
  */
-var config = require('../config')[process.env.NODE_ENV]; //获取配置文件
+var config = require('../config'); //获取配置文件
 var knex = require('knex')(config.database );   //初始化数据库
 var bookshelf = require('bookshelf')(knex);
 

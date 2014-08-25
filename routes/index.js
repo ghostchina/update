@@ -6,8 +6,8 @@ var express = require('express');
 var _ = require('lodash');
 var router = express.Router();
 var oneDay = 24*60*60;
+var config = require('../config');
 
-var Version = require('../db').Version;
 var UpdateLog  = require('../db').UpdateLog;
 
 /* GET home page. */
@@ -24,19 +24,11 @@ router.post('/', function(req, res) {
         // console.log(model)
     });
 
-    //获取到最新的版本和下一次更新的时间
-    new Version().fetchAll().then(function(collections){
-        collections.query(function(qb){
-            qb.orderBy('id', 'desc');
-        }).fetchOne().then(function(model){
-            //响应数据
-            var resData = {
-                version: model.get('version'),
-                next_check: parseInt(new Date().getTime()/1000)+oneDay
-            };
-            res.json(resData);
-        })
-    });
+    var resData = {
+	    version: config.currentVersion,
+	    next_check: parseInt(new Date().getTime()/1000)+oneDay
+	};
+    res.json(resData);
 });
 
 module.exports = router;
