@@ -15,7 +15,7 @@ router.post('/', function(req, res) {
     //保存当前请求的信息
    var reqData = JSON.parse(req.rawBody);
     reqData.req_date = new Date();
-    reqData.headers = req.rawBody;
+    reqData.raw_request = req.rawBody;
     reqData.ip = req.ip;
 
     reqData = _.omit(reqData, 'email_transport');
